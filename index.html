@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YourBrand - Build Something Amazing</title>
+  <meta name="description" content="Modern, responsive website built with HTML and Tailwind CSS. Transform your ideas into reality with our powerful platform.">
+  <title>Nexus - Build Something Amazing</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
   <nav class="sticky top-0 z-50 bg-white shadow-md py-4">
     <div class="container mx-auto px-6">
       <div class="flex items-center justify-between">
-        <a href="#" class="text-2xl font-bold text-gray-900">YourBrand</a>
+        <a href="#" class="text-2xl font-bold text-gray-900">Nexus</a>
         
         <div class="hidden md:flex items-center space-x-8">
           <a href="#home" class="text-gray-700 hover:text-indigo-600 transition">Home</a>
@@ -58,9 +60,10 @@
           
           <div class="flex-1">
             <img 
-              src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop" 
-              alt="Modern workspace with technology" 
+              src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop&q=80" 
+              alt="Modern workspace with technology and digital innovation" 
               class="rounded-xl shadow-2xl w-full h-auto"
+              loading="lazy"
             >
           </div>
         </div>
@@ -166,7 +169,8 @@
         </div>
         
         <div class="max-w-2xl mx-auto">
-          <form class="rounded-xl shadow-lg p-10 bg-white">
+          <form id="contact-form" class="rounded-xl shadow-lg p-10 bg-white" novalidate>
+            <div id="form-message" class="hidden mb-6 p-4 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200"></div>
             <div class="space-y-6">
               <div>
                 <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">
@@ -290,7 +294,7 @@
           </div>
           
           <p class="text-gray-400 text-sm">
-            © 2024 YourCompany. All rights reserved.
+            © <span id="copyright-year">2025</span> Nexus. All rights reserved.
           </p>
         </div>
       </div>
@@ -298,16 +302,112 @@
   </footer>
 
   <script>
-    document.getElementById('mobile-menu-button').addEventListener('click', function() {
-      const menu = document.getElementById('mobile-menu');
-      const menuIcon = document.getElementById('menu-icon');
-      const closeIcon = document.getElementById('close-icon');
-      const button = this;
-      
-      menu.classList.toggle('hidden');
+    // Set copyright year dynamically
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+    // Mobile menu functionality with keyboard accessibility
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const menuLinks = mobileMenu.querySelectorAll('a');
+
+    function toggleMenu() {
+      const isHidden = mobileMenu.classList.contains('hidden');
+      mobileMenu.classList.toggle('hidden');
       menuIcon.classList.toggle('hidden');
       closeIcon.classList.toggle('hidden');
-      button.setAttribute('aria-expanded', menu.classList.contains('hidden') ? 'false' : 'true');
+      mobileMenuButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      
+      // Focus management
+      if (isHidden) {
+        // Menu opened - focus first link
+        menuLinks[0].focus();
+      } else {
+        // Menu closed - return focus to button
+        mobileMenuButton.focus();
+      }
+    }
+
+    function closeMenu() {
+      if (!mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+        mobileMenuButton.focus();
+      }
+    }
+
+    // Click handler
+    mobileMenuButton.addEventListener('click', toggleMenu);
+
+    // Keyboard handler (Enter/Space)
+    mobileMenuButton.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleMenu();
+      }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    });
+
+    // Close menu when a link is clicked (mobile)
+    menuLinks.forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    // Contact form handling
+    const contactForm = document.getElementById('contact-form');
+    const formMessage = document.getElementById('form-message');
+
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(contactForm);
+      const name = formData.get('fullname');
+      const email = formData.get('email');
+      const message = formData.get('message');
+
+      // Basic validation
+      if (!name || !email || !message) {
+        formMessage.textContent = 'Please fill in all required fields.';
+        formMessage.className = 'mb-6 p-4 rounded-lg bg-red-50 text-red-800 border border-red-200';
+        formMessage.classList.remove('hidden');
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        formMessage.textContent = 'Please enter a valid email address.';
+        formMessage.className = 'mb-6 p-4 rounded-lg bg-red-50 text-red-800 border border-red-200';
+        formMessage.classList.remove('hidden');
+        return;
+      }
+
+      // Demo submission - show success message
+      formMessage.textContent = `Thank you, ${name}! Your message has been received. (This is a demo form - in production, this would be sent to a server.)`;
+      formMessage.className = 'mb-6 p-4 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200';
+      formMessage.classList.remove('hidden');
+      
+      // Reset form
+      contactForm.reset();
+      
+      // Scroll to message
+      formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   </script>
 </body>
